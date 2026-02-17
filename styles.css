@@ -1,0 +1,318 @@
+/* Food Chain Magnate - Brutalist/Retro Aesthetic */
+
+:root {
+    --primary-color: #FF6B35;
+    --secondary-color: #F7931E;
+    --accent-color: #FDC830;
+    --dark-bg: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-light: #f0f0f0;
+    --border-color: #444;
+    --success-color: #4CAF50;
+    --grid-size: 60px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: var(--text-light);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Header */
+.game-header {
+    background: var(--dark-bg);
+    border-bottom: 4px solid var(--primary-color);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 3px 3px 0 var(--primary-color);
+}
+
+.game-info {
+    display: flex;
+    gap: 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.game-info span {
+    background: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+}
+
+/* Main Container */
+.game-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Game Board */
+.game-board {
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(8, var(--grid-size));
+    grid-template-rows: repeat(8, var(--grid-size));
+    gap: 2px;
+    background: var(--dark-bg);
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+}
+
+.grid-cell {
+    background: #333;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.grid-cell:hover {
+    background: #444;
+    transform: scale(1.05);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-color);
+}
+
+.grid-cell.house {
+    background: #4a5568;
+}
+
+.grid-cell.restaurant {
+    background: var(--primary-color);
+}
+
+.grid-cell.garden {
+    background: var(--success-color);
+}
+
+/* Player Dashboard */
+.player-dashboard {
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.player-info h2 {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.bank-balance {
+    background: var(--dark-bg);
+    padding: 1rem;
+    border: 2px solid var(--success-color);
+    border-radius: 4px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+/* Organization Chart */
+.organization-chart {
+    flex: 1;
+}
+
+.organization-chart h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.employee-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 200px;
+    background: var(--dark-bg);
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.employee-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 0.75rem;
+    border: 2px solid var(--accent-color);
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.employee-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Inventory */
+.inventory h3 {
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.inventory-items {
+    background: var(--dark-bg);
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.inventory-items .item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background: var(--card-bg);
+    border-left: 3px solid var(--accent-color);
+    font-size: 1rem;
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 3px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+}
+
+.btn-secondary {
+    background: var(--card-bg);
+    color: var(--text-light);
+    border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 4px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 800px;
+    width: 90%;
+    box-shadow: 0 10px 50px rgba(255, 107, 53, 0.5);
+}
+
+.modal-content h2 {
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.employee-card {
+    animation: slideIn 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .game-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .player-dashboard {
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Chain Magnate Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app">
+        <header class="game-header">
+            <h1>Food Chain Magnate</h1>
+            <div class="game-info">
+                <span id="current-phase">Phase: Setup</span>
+                <span id="current-player">Player: 1</span>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <!-- Game Board -->
+            <section class="game-board">
+                <div id="map-grid" class="map-grid"></div>
+            </section>
+
+            <!-- Player Dashboard -->
+            <aside class="player-dashboard">
+                <div class="player-info">
+                    <h2>Your Organization</h2>
+                    <div class="bank-balance">
+                        <span>Bank: $</span>
+                        <span id="player-money">20</span>
+                    </div>
+                </div>
+
+                <div class="organization-chart">
+                    <h3>Employees</h3>
+                    <div id="employee-slots" class="employee-slots">
+                        <!-- Employee cards will be added here -->
+                    </div>
+                </div>
+
+                <div class="inventory">
+                    <h3>Inventory</h3>
+                    <div class="inventory-items">
+                        <div class="item">🍔 Burgers: <span id="burger-count">0</span></div>
+                        <div class="item">🍕 Pizza: <span id="pizza-count">0</span></div>
+                        <div class="item">🥤 Drinks: <span id="drink-count">0</span></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button id="end-turn-btn" class="btn-primary">End Turn</button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Card Shop Modal -->
+        <div id="card-shop-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Hire Employees</h2>
+                <div id="available-cards" class="card-grid"></div>
+                <button id="close-shop-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MVC Architecture -->
+    <script src="model/GameState.js"></script>
+    <script src="view/GameView.js"></script>
+    <script src="controller/GameController.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
