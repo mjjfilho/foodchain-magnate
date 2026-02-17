@@ -1,123 +1,135 @@
 # 🍔 Food Chain Magnate Online
 
-A web-based implementation of the strategic board game Food Chain Magnate with real-time multiplayer capabilities.
+A web-based implementation of the cult classic board game [Food Chain Magnate](https://boardgamegeek.com/boardgame/175914/food-chain-magnate) with real-time multiplayer. Build your fast-food empire, outmaneuver rivals, and dominate the market.
 
-## 🎮 Features
-
-### Current Implementation (MVP 1 - Sandbox Mode)
-- ✅ **Interactive 8x8 Game Board** with houses, restaurants, and gardens
-- ✅ **Player Dashboard** showing money, employees, and inventory
-- ✅ **Hiring System** with 8 different employee types
-- ✅ **Turn-Based Phases** (Setup → Hiring → Marketing → Production → Dinner → Payday → Cleanup)
-- ✅ **Inventory Management** for burgers, pizza, and drinks
-- ✅ **Building Placement** on the game map
-- ✅ **Brutalist/Retro Aesthetic** with vibrant colors and smooth animations
-
-## 🚀 Getting Started
-
-### Quick Start
-1. Open `index.html` in your web browser
-2. Press **H** to open the hiring menu
-3. Click on the map to place buildings
-4. Press **Enter** to end your turn
-
-### Keyboard Shortcuts
-- **H** - Open hiring menu
-- **Enter** - End turn / Next phase
-- **Escape** - Close modals
-
-### Debug Commands (Console)
-```javascript
-produceFood("burgers")  // Add a burger to inventory
-produceFood("pizza")    // Add a pizza to inventory
-produceFood("drinks")   // Add a drink to inventory
-addMoney(50)            // Add $50 to current player
-```
-
-## 📋 Game Phases
-
-1. **Setup** - Initial game setup
-2. **Hiring** - Hire new employees
-3. **Marketing** - Place marketing campaigns
-4. **Production** - Produce food and drinks
-5. **Dinner** - Customers buy from restaurants
-6. **Payday** - Pay employee salaries
-7. **Cleanup** - Reset for next turn
-
-## 🎨 Design Philosophy
-
-The game uses a **Brutalist/Retro aesthetic** featuring:
-- Bold, vibrant color palette (Orange, Yellow gradients)
-- Monospace typography (Courier New)
-- Strong borders and shadows
-- Smooth micro-animations
-- Dark mode by default
-
-## 🗺️ Roadmap
-
-### Phase 1: Project Setup ✅
-- [x] Initialize project structure
-- [x] Create HTML/CSS/JS files
-- [x] Implement basic game engine
-
-### Phase 2: Core Game Engine (In Progress)
-- [x] Game state management
-- [x] Turn phase system
-- [x] Basic organization chart
-- [ ] Complete milestone tracking
-- [ ] Full dinner phase logic
-
-### Phase 3: Map & Board
-- [x] 2D grid map system
-- [x] Tile placement logic
-- [x] Player board components
-- [x] Inventory management
-
-### Phase 4: UI Components
-- [x] Card components
-- [x] Interactive map view
-- [x] Player dashboard
-- [x] Hiring interface
-- [ ] Marketing placement UI
-- [ ] Production interface
-
-### Phase 5: Multiplayer & Polish
-- [ ] WebSocket server setup
-- [ ] Real-time state synchronization
-- [ ] Advanced animations
-- [ ] Custom game assets
-- [ ] Sound effects
-
-## 🛠️ Tech Stack
-
-- **Frontend**: Vanilla HTML, CSS, JavaScript
-- **Future**: Node.js + WebSockets for multiplayer
-- **Potential**: boardgame.io framework for advanced features
-
-## 📝 Employee Types
-
-1. **Recruiting Girl** ($3) - Hire 1 employee
-2. **Trainer** ($5) - Train 1 employee
-3. **Burger Chef** ($5) - Produce burgers
-4. **Pizza Chef** ($5) - Produce pizza
-5. **Errand Boy** ($3) - Deliver food
-6. **Waitress** ($4) - Serve customers
-7. **Marketing Manager** ($8) - Market to 2 houses
-8. **CEO** ($15) - Manage all operations
-
-## 🎯 Current Status
-
-**MVP 1 (Sandbox Mode)** - ✅ Complete
-- Single-player mode functional
-- Basic hiring and placement working
-- Turn system implemented
-
-**Next Steps**: Implement full dinner phase logic with distance calculation and price competition.
-
-## 📄 License
-
-This is a fan-made implementation for educational purposes. Food Chain Magnate is designed by Jeroen Doumen and Joris Wiersinga, published by Splotter Spellen.
+> **Status**: 📋 Pre-production — rules finalized, architecture planned, implementation starting.
 
 ---
 
-**Made with ❤️ for board game enthusiasts**
+## 🎯 What Is This?
+
+Food Chain Magnate is a heavy economic strategy board game by Splotter Spellen. Players build fast-food corporations by hiring employees, training them up career trees, marketing to neighborhoods, and competing to serve demand generated across a modular tile map.
+
+This project implements the **full base game + The Ketchup Mechanism expansion** as a browser-based multiplayer experience.
+
+---
+
+## 🎨 Aesthetic
+
+**Mid-Century American Diner** (1940s–1950s) — vintage Americana, Streamline Moderne curves, pin-up advertising influence.
+
+| | |
+|---|---|
+| 🔴 `#BF4646` Diner Red | 🟢 `#7EACB5` Retro Teal |
+| 🟡 `#EDDCC6` Warm Cream | ⚪ `#FFF4EA` Off-White |
+
+Typography: **Fredoka One** (headlines) · **Nunito** (body)
+
+Full design system in [`DESIGN.md`](DESIGN.md).
+
+---
+
+## 🗺️ Roadmap
+
+| Phase | Description | Status |
+|---|---|---|
+| **0** | Design system + employee data structures | ⬜ Next |
+| **1** | Game engine — single-player sandbox (hot-seat) | ⬜ |
+| **2** | Node.js server + Socket.io room system | ⬜ |
+| **3** | Server authority multiplayer | ⬜ |
+| **4** | Reconnection, spectators, AI, persistence | ⬜ |
+
+### Architecture
+
+```
+Phase 0–1: GameState.js runs in the Browser (sandbox)
+Phase 3+:  GameState.js runs on the Server (multiplayer)
+             ↕ same file, zero rewrite
+```
+
+The game engine is the **same JavaScript code** in both modes. For a turn-based board game, multiplayer is just "CRUD with WebSocket notifications" — the server validates actions and broadcasts state. No client-side prediction, no desync.
+
+---
+
+## 📋 Game Overview
+
+- **2–5 players** on a modular tile map (3×3 to 5×4)
+- **7 phases per turn**: Restructuring → Order of Business → Working 9-5 → Dinnertime → Payday → Marketing Campaigns → Cleanup
+- **~25 employee types** across 8 career branches (management, kitchen, marketing, logistics, pricing, recruitment, training, service)
+- **18 base milestones** + **17 expansion milestones** (first-mover permanent bonuses)
+- **Dinnertime** as core economic loop: attractiveness = unit price + distance
+
+Full rules specification in [`RULES.md`](RULES.md).
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Vanilla HTML + CSS + JavaScript (MVC) |
+| Backend | Node.js + Express + Socket.io |
+| Auth | Nickname-based (no database initially) |
+| Deploy | Render.com / Railway (planned) |
+
+---
+
+## 🚀 Getting Started
+
+### Quick Start (Phase 0–1: Sandbox)
+```bash
+# No build step — just open in browser
+open index.html
+```
+
+### Multiplayer (Phase 2+)
+```bash
+npm install
+npm run dev
+# Open http://localhost:3000
+```
+
+---
+
+## 📁 Project Structure
+
+```
+FoodchainMagnate/
+├── index.html              # Entry point
+├── app.js                  # Bootstrap (MVC wiring)
+├── styles.css              # Design system
+├── model/
+│   ├── GameState.js        # Core game state + phase machine
+│   ├── EmployeeData.js     # Career tree DAG (planned)
+│   ├── OrgChart.js         # Player org chart (planned)
+│   ├── MapState.js         # Tile map + pathfinding (planned)
+│   ├── DinnertimeResolver.js  # Demand matching (planned)
+│   └── MarketingResolver.js   # Campaign logic (planned)
+├── view/
+│   └── GameView.js         # DOM rendering
+├── controller/
+│   └── GameController.js   # Input handling + model↔view
+├── server/                 # (Phase 2+)
+│   ├── index.js            # Express + Socket.io
+│   ├── RoomManager.js      # Room creation/joining
+│   └── GameSession.js      # Server-side game wrapper
+├── RULES.md                # Complete game rules specification
+├── DESIGN.md               # Visual design system
+└── DEVLOG.md               # Development diary
+```
+
+---
+
+## 📝 Dev Diary
+
+Development progress is documented in [`DEVLOG.md`](DEVLOG.md) (English + Português).
+
+---
+
+## 📄 License
+
+Fan-made implementation for educational purposes. Food Chain Magnate is designed by Jeroen Doumen and Joris Wiersinga, published by [Splotter Spellen](https://www.splottershop.com/).
+
+---
+
+**Made with ❤️ and 🍔 for board game enthusiasts**

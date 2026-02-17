@@ -5,44 +5,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Chain Magnate Online</title>
+    <meta name="description"
+        content="Play Food Chain Magnate online — build your fast-food empire in this strategic board game.">
+
+    <!-- Google Fonts: Fredoka One (headlines) + Nunito (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <div id="app">
         <header class="game-header">
-            <h1>Food Chain Magnate</h1>
+            <h1>🍔 Food Chain Magnate</h1>
             <div class="game-info">
                 <span id="current-phase">Phase: Setup</span>
+                <span id="current-turn">Turn: 1</span>
                 <span id="current-player">Player: 1</span>
+                <span id="bank-balance" class="bank-indicator">🏦 Bank: $0</span>
             </div>
         </header>
 
+        <!-- Phase Indicator Bar -->
+        <nav class="phase-bar" id="phase-bar">
+            <div class="phase-step" data-phase="restructuring">Restructuring</div>
+            <div class="phase-step" data-phase="order_of_business">Order</div>
+            <div class="phase-step active" data-phase="working">Working 9-5</div>
+            <div class="phase-step" data-phase="dinnertime">Dinnertime</div>
+            <div class="phase-step" data-phase="payday">Payday</div>
+            <div class="phase-step" data-phase="marketing">Marketing</div>
+            <div class="phase-step" data-phase="cleanup">Cleanup</div>
+        </nav>
+
         <main class="game-container">
-            <!-- Game Board -->
+            <!-- Top row: Map + Sidebar -->
             <section class="game-board">
                 <div id="map-grid" class="map-grid"></div>
             </section>
 
-            <!-- Player Dashboard -->
+            <!-- Compact Sidebar -->
             <aside class="player-dashboard">
                 <div class="player-info">
-                    <h2>Your Organization</h2>
+                    <h2>Your Corporation</h2>
                     <div class="bank-balance">
-                        <span>Bank: $</span>
-                        <span id="player-money">20</span>
+                        <span>💰</span>
+                        <span>$<span id="player-money">0</span></span>
                     </div>
                 </div>
 
-                <div class="organization-chart">
-                    <h3>Employees</h3>
-                    <div id="employee-slots" class="employee-slots">
-                        <!-- Employee cards will be added here -->
-                    </div>
-                </div>
-
+                <!-- Inventory -->
                 <div class="inventory">
-                    <h3>Inventory</h3>
+                    <h3>📦 Inventory</h3>
                     <div class="inventory-items">
                         <div class="item">🍔 Burgers: <span id="burger-count">0</span></div>
                         <div class="item">🍕 Pizza: <span id="pizza-count">0</span></div>
@@ -50,23 +66,54 @@
                     </div>
                 </div>
 
+                <!-- Beach Section -->
+                <div class="beach-section">
+                    <h4>🏖️ Beach</h4>
+                    <div id="beach-employees">
+                        <span class="beach-label">🌊 No employees on the beach</span>
+                    </div>
+                </div>
+
                 <div class="actions">
-                    <button id="end-turn-btn" class="btn-primary">End Turn</button>
+                    <button id="end-turn-btn" class="btn-primary">End Phase</button>
                 </div>
             </aside>
+
+            <!-- Organization Chart (full width below map) -->
+            <section class="org-chart-panel">
+                <h3>📋 Organization Chart</h3>
+                <div id="org-chart-tree" class="org-chart-tree"></div>
+            </section>
         </main>
 
-        <!-- Card Shop Modal -->
+        <!-- Hiring Modal -->
         <div id="card-shop-modal" class="modal hidden">
             <div class="modal-content">
-                <h2>Hire Employees</h2>
+                <h2>🤝 Hire Employees</h2>
+                <p style="text-align: center; color: var(--warm-gray); margin-bottom: var(--space-md);">
+                    Entry-level employees only. Assign to org chart during Restructuring.
+                </p>
                 <div id="available-cards" class="card-grid"></div>
                 <button id="close-shop-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+
+        <!-- Training Modal -->
+        <div id="training-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>🎓 Train Employee</h2>
+                <p style="text-align: center; color: var(--warm-gray); margin-bottom: var(--space-md);">
+                    Select a beach employee and a valid promotion target.
+                </p>
+                <div id="training-options" class="card-grid"></div>
+                <button id="close-training-btn" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- MVC Architecture -->
+    <script src="model/EmployeeData.js"></script>
+    <script src="model/OrgChart.js"></script>
     <script src="model/GameState.js"></script>
     <script src="view/GameView.js"></script>
     <script src="controller/GameController.js"></script>

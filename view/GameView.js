@@ -1,145 +1,343 @@
 // Food Chain Magnate - View: GameView
-// Pure DOM rendering — receives data, outputs HTML. No game logic.
+// Renders game state to DOM — no game logic, only presentation
+// Diner aesthetic with org chart tree, phase bar, beach section
 
 class GameView {
     constructor() {
-        // Cache DOM references
         this.elements = {
+            // Header
+            currentPhase: document.getElementById('current-phase'),
+            currentTurn: document.getElementById('current-turn'),
+            currentPlayer: document.getElementById('current-player'),
+            phaseBar: document.getElementById('phase-bar'),
+            bankBalance: document.getElementById('bank-balance'),
+
+            // Map
             mapGrid: document.getElementById('map-grid'),
+
+            // Dashboard
             playerMoney: document.getElementById('player-money'),
             burgerCount: document.getElementById('burger-count'),
             pizzaCount: document.getElementById('pizza-count'),
             drinkCount: document.getElementById('drink-count'),
-            employeeSlots: document.getElementById('employee-slots'),
-            currentPhase: document.getElementById('current-phase'),
-            currentPlayer: document.getElementById('current-player'),
+            orgChartTree: document.getElementById('org-chart-tree'),
+            beachEmployees: document.getElementById('beach-employees'),
+
+            // Modals
             cardShopModal: document.getElementById('card-shop-modal'),
             availableCards: document.getElementById('available-cards'),
-            actionsDiv: document.querySelector('.actions')
+            trainingModal: document.getElementById('training-modal'),
+            trainingOptions: document.getElementById('training-options'),
+
+            // Actions
+            endTurnBtn: document.getElementById('end-turn-btn'),
         };
     }
 
-    // --- Map Rendering ---
+    // ═══════════════════════════════════════════
+    // PHASE BAR
+    // ═══════════════════════════════════════════
 
-    renderMap(map, onCellClick) {
-        const { mapGrid } = this.elements;
-        mapGrid.innerHTML = '';
+    updatePhaseBar(currentPhase, phases) {
+        const steps = this.elements.phaseBar.querySelectorAll('.phase-step');
+        const currentIdx = phases.indexOf(currentPhase);
 
-        const tileIcons = {
-            house: '🏠',
-            restaurant: '🍔',
-            garden: '🌳'
-        };
-
-        for (let row = 0; row < map.length; row++) {
-            for (let col = 0; col < map[row].length; col++) {
-                const cell = map[row][col];
-                const cellDiv = document.createElement('div');
-                cellDiv.className = `grid-cell ${cell.type}`;
-                cellDiv.dataset.row = row;
-                cellDiv.dataset.col = col;
-
-                if (tileIcons[cell.type]) {
-                    cellDiv.textContent = tileIcons[cell.type];
-                }
-
-                cellDiv.addEventListener('click', () => onCellClick(row, col));
-                mapGrid.appendChild(cellDiv);
+        steps.forEach((step, i) => {
+            step.classList.remove('active', 'completed');
+            if (i === currentIdx) {
+                step.classList.add('active');
+            } else if (i < currentIdx) {
+                step.classList.add('completed');
             }
-        }
+        });
     }
 
-    // --- Player Dashboard ---
+    updateHeader(phase, turn, playerName) {
+        const phaseNames = {
+            restructuring: 'Restructuring',
+            order_of_business: 'Order of Business',
+            working: 'Working 9-5',
+            dinnertime: 'Dinnertime',
+            payday: 'Payday',
+            marketing_campaigns: 'Marketing',
+            cleanup: 'Cleanup',
+        };
+        this.elements.currentPhase.textContent = `Phase: ${phaseNames[phase] || phase}`;
+        this.elements.currentTurn.textContent = `Turn: ${turn}`;
+        this.elements.currentPlayer.textContent = `🎮 ${playerName}`;
+    }
+
+    updateBank(bankAmount) {
+        this.elements.bankBalance.textContent = `🏦 Bank: $${bankAmount}`;
+    }
+
+    // ═══════════════════════════════════════════
+    // PLAYER DASHBOARD
+    // ═══════════════════════════════════════════
 
     updateDashboard(player) {
         this.elements.playerMoney.textContent = player.money;
-        this.elements.burgerCount.textContent = player.inventory.burgers;
+
+        this.elements.burgerCount.textContent = player.inventory.burger;
         this.elements.pizzaCount.textContent = player.inventory.pizza;
-        this.elements.drinkCount.textContent = player.inventory.drinks;
-        this.renderEmployees(player.employees);
+
+        // Combine all drinks for display
+        const totalDrinks = player.inventory.beer + player.inventory.coke + player.inventory.lemonade;
+        this.elements.drinkCount.textContent = totalDrinks;
     }
 
-    renderEmployees(employees, onEmployeeClick) {
-        const { employeeSlots } = this.elements;
-        employeeSlots.innerHTML = '';
+    // ═══════════════════════════════════════════
+    // ORG CHART TREE
+    // ═══════════════════════════════════════════
 
-        if (employees.length === 0) {
-            employeeSlots.innerHTML = '<p style="color: #888; text-align: center;">No employees hired yet</p>';
+    renderOrgChart(orgChart, onNodeClick, onSlotClick) {
+        const container = this.elements.orgChartTree;
+        container.innerHTML = '';
+
+        const ceo = orgChart.getCEO();
+        if (!ceo) return;
+
+        const ceoDiv = this._createOrgNode(ceo, 0, onNodeClick);
+        container.appendChild(ceoDiv);
+
+        // Render children recursively
+        this._renderChildren(orgChart, ceo, ceoDiv, 1, onNodeClick);
+
+        // Show empty slots
+        const openSlots = ceo.maxChildren - ceo.children.length;
+        for (let i = 0; i < openSlots; i++) {
+            const slotDiv = this._createEmptySlot(ceo.nodeId, onSlotClick);
+            container.appendChild(slotDiv);
+        }
+    }
+
+    _renderChildren(orgChart, parentNode, parentDiv, depth, onNodeClick) {
+        for (const childId of parentNode.children) {
+            const child = orgChart.getNode(childId);
+            if (!child) continue;
+
+            const childDiv = this._createOrgNode(child, depth, onNodeClick);
+            parentDiv.after(childDiv);
+
+            this._renderChildren(orgChart, child, childDiv, depth + 1, onNodeClick);
+        }
+    }
+
+    _createOrgNode(node, depth, onNodeClick) {
+        const emp = typeof getEmployee !== 'undefined' ? getEmployee(node.employeeId) : null;
+        const branch = emp ? emp.branch : 'management';
+        const name = emp ? emp.name : node.employeeId;
+        const icon = typeof BRANCHES !== 'undefined' && BRANCHES[branch] ? BRANCHES[branch].icon : '📋';
+
+        const div = document.createElement('div');
+        div.className = 'employee-card';
+        div.dataset.branch = branch;
+        div.dataset.nodeId = node.nodeId;
+        div.style.marginLeft = `${depth * 16}px`;
+
+        const slotsInfo = node.maxChildren > 0
+            ? ` · ${node.children.length}/${node.maxChildren}`
+            : '';
+
+        div.innerHTML = `
+            <div class="card-name">${icon} ${name}</div>
+            <div class="card-info">${branch}${slotsInfo}</div>
+        `;
+
+        if (onNodeClick) {
+            div.addEventListener('click', () => onNodeClick(node));
+        }
+
+        return div;
+    }
+
+    _createEmptySlot(parentNodeId, onSlotClick) {
+        const div = document.createElement('div');
+        div.className = 'employee-card';
+        div.style.borderStyle = 'dashed';
+        div.style.opacity = '0.5';
+        div.style.marginLeft = '16px';
+        div.innerHTML = `
+            <div class="card-name">➕ Empty slot</div>
+            <div class="card-info">Assign during Restructuring</div>
+        `;
+
+        if (onSlotClick) {
+            div.addEventListener('click', () => onSlotClick(parentNodeId));
+        }
+
+        return div;
+    }
+
+    // ═══════════════════════════════════════════
+    // BEACH
+    // ═══════════════════════════════════════════
+
+    renderBeach(beachEmployees, onBeachClick) {
+        const container = this.elements.beachEmployees;
+        container.innerHTML = '';
+
+        if (beachEmployees.length === 0) {
+            container.innerHTML = '<span class="beach-label">🌊 No employees on the beach</span>';
             return;
         }
 
-        employees.forEach((employee, index) => {
-            const card = document.createElement('div');
-            card.className = 'employee-card';
-            card.innerHTML = `
-                <strong>${employee.name}</strong>
-                <div style="font-size: 0.9rem; margin-top: 0.3rem;">
-                    ${employee.type} | $${employee.cost}
-                </div>
-            `;
+        for (const entry of beachEmployees) {
+            const emp = typeof getEmployee !== 'undefined' ? getEmployee(entry.employeeId) : null;
+            const name = emp ? emp.name : entry.employeeId;
+            const branch = emp ? emp.branch : 'management';
+            const icon = typeof BRANCHES !== 'undefined' && BRANCHES[branch] ? BRANCHES[branch].icon : '📋';
 
-            if (onEmployeeClick) {
-                card.addEventListener('click', () => onEmployeeClick(employee, index));
+            const badge = document.createElement('div');
+            badge.className = 'employee-card';
+            badge.dataset.branch = branch;
+            badge.style.fontSize = '0.85rem';
+            badge.innerHTML = `<div class="card-name">${icon} ${name}</div>`;
+
+            if (onBeachClick) {
+                badge.addEventListener('click', () => onBeachClick(entry));
             }
 
-            employeeSlots.appendChild(card);
-        });
+            container.appendChild(badge);
+        }
     }
 
-    // --- Phase Display ---
+    // ═══════════════════════════════════════════
+    // HIRING MODAL
+    // ═══════════════════════════════════════════
 
-    updatePhaseDisplay(phase, currentPlayer) {
-        this.elements.currentPhase.textContent = `Phase: ${phase}`;
-        this.elements.currentPlayer.textContent = `Player: ${currentPlayer}`;
-    }
-
-    // --- Card Shop ---
-
-    showCardShop(cards, onCardClick) {
+    showHiringModal(hireableEmployees, onHireClick) {
         const { cardShopModal, availableCards } = this.elements;
         availableCards.innerHTML = '';
 
-        cards.forEach(card => {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = 'employee-card';
-            cardDiv.innerHTML = `
-                <strong>${card.name}</strong>
-                <div style="font-size: 0.85rem; margin-top: 0.3rem;">
-                    ${card.type}
+        if (hireableEmployees.length === 0) {
+            availableCards.innerHTML = '<p style="text-align:center; color: var(--warm-gray);">No employees available in supply.</p>';
+        }
+
+        for (const emp of hireableEmployees) {
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.dataset.branch = emp.branch;
+            card.style.cursor = 'pointer';
+
+            const icon = typeof BRANCHES !== 'undefined' && BRANCHES[emp.branch] ? BRANCHES[emp.branch].icon : '📋';
+
+            card.innerHTML = `
+                <div class="card-name">${icon} ${emp.name}</div>
+                <div class="card-info">
+                    ${emp.branch} · Level ${emp.level}
                 </div>
-                <div style="font-size: 1rem; margin-top: 0.3rem; color: #FDC830;">
-                    $${card.cost}
+                <div class="card-info" style="color: var(--retro-teal-dark);">
+                    Supply: ${emp.currentSupply}
                 </div>
             `;
 
-            cardDiv.addEventListener('click', () => onCardClick(card));
-            availableCards.appendChild(cardDiv);
-        });
+            card.addEventListener('click', () => onHireClick(emp));
+            availableCards.appendChild(card);
+        }
 
         cardShopModal.classList.remove('hidden');
     }
 
-    hideCardShop() {
+    hideHiringModal() {
         this.elements.cardShopModal.classList.add('hidden');
     }
 
-    // --- Notifications ---
+    // ═══════════════════════════════════════════
+    // TRAINING MODAL
+    // ═══════════════════════════════════════════
+
+    showTrainingModal(beachEmployee, validPromotions, onTrainClick) {
+        const { trainingModal, trainingOptions } = this.elements;
+        trainingOptions.innerHTML = '';
+
+        const currentEmp = typeof getEmployee !== 'undefined' ? getEmployee(beachEmployee.employeeId) : null;
+        const currentName = currentEmp ? currentEmp.name : beachEmployee.employeeId;
+
+        // Header
+        const header = document.createElement('p');
+        header.style.cssText = 'text-align: center; margin-bottom: var(--space-md); font-weight: 700;';
+        header.textContent = `Training: ${currentName}`;
+        trainingOptions.appendChild(header);
+
+        if (validPromotions.length === 0) {
+            trainingOptions.innerHTML += '<p style="text-align:center; color: var(--warm-gray);">No valid promotions available.</p>';
+        }
+
+        for (const targetId of validPromotions) {
+            const targetEmp = typeof getEmployee !== 'undefined' ? getEmployee(targetId) : null;
+            if (!targetEmp) continue;
+
+            const icon = typeof BRANCHES !== 'undefined' && BRANCHES[targetEmp.branch] ? BRANCHES[targetEmp.branch].icon : '📋';
+
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.dataset.branch = targetEmp.branch;
+            card.style.cursor = 'pointer';
+            card.innerHTML = `
+                <div class="card-name">${icon} ${targetEmp.name}</div>
+                <div class="card-info">${targetEmp.branch} · Level ${targetEmp.level} · $${targetEmp.salary}/turn</div>
+            `;
+
+            card.addEventListener('click', () => onTrainClick(beachEmployee, targetId));
+            trainingOptions.appendChild(card);
+        }
+
+        trainingModal.classList.remove('hidden');
+    }
+
+    hideTrainingModal() {
+        this.elements.trainingModal.classList.add('hidden');
+    }
+
+    // ═══════════════════════════════════════════
+    // MAP (placeholder — will be replaced by MapState renderer in Phase 1b)
+    // ═══════════════════════════════════════════
+
+    renderMap(onCellClick) {
+        const { mapGrid } = this.elements;
+        mapGrid.innerHTML = '';
+
+        // Simple 8x8 placeholder grid
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+
+                // Some placeholder houses
+                if ((row === 2 && col === 2) || (row === 2 && col === 5) ||
+                    (row === 5 && col === 2) || (row === 5 && col === 5)) {
+                    cell.classList.add('house');
+                    cell.textContent = '🏠';
+                }
+
+                if (onCellClick) {
+                    cell.addEventListener('click', () => onCellClick(row, col));
+                }
+
+                mapGrid.appendChild(cell);
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════
+    // MILESTONES
+    // ═══════════════════════════════════════════
+
+    renderMilestones(milestonesOwned) {
+        // We'll render milestone badges inline — for now just show in console
+        // Full milestone panel will come with UI polish
+    }
+
+    // ═══════════════════════════════════════════
+    // NOTIFICATIONS
+    // ═══════════════════════════════════════════
 
     showNotification(message, type = 'success') {
         const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#4CAF50' : '#FF6B35'};
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            font-weight: bold;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        `;
+        notification.className = `notification ${type}`;
         notification.textContent = message;
         document.body.appendChild(notification);
 
@@ -147,18 +345,7 @@ class GameView {
             notification.style.opacity = '0';
             notification.style.transition = 'opacity 0.3s ease';
             setTimeout(() => notification.remove(), 300);
-        }, 2000);
-    }
-
-    // --- Quick Actions ---
-
-    addQuickAction(label, onClick) {
-        const btn = document.createElement('button');
-        btn.className = 'btn-secondary';
-        btn.textContent = label;
-        btn.style.marginBottom = '0.5rem';
-        btn.addEventListener('click', onClick);
-        this.elements.actionsDiv.insertBefore(btn, this.elements.actionsDiv.firstChild);
+        }, 2500);
     }
 }
 

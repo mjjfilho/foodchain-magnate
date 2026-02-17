@@ -1,48 +1,37 @@
-// Food Chain Magnate - Application Entry Point
-// Bootstraps the MVC architecture
+// Food Chain Magnate Online — Entry Point
+// Initializes MVC architecture and wires components together
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🍔 Food Chain Magnate Online - Starting...');
+    // ─── Create Model ───
+    const model = new GameState({
+        playerCount: 2,
+        playerNames: ['Player 1', 'Player 2'],
+        beginnerMode: true,  // No Bank Reserve, $150 bank
+    });
 
-    // Model
-    const model = new GameState();
-
-    // View
+    // ─── Create View ───
     const view = new GameView();
 
-    // Controller (wires Model + View together)
+    // ─── Create Controller ───
     const controller = new GameController(model, view);
 
-    // Make available globally for debugging
-    window.game = { model, view, controller };
+    // ─── Debug Globals ───
+    window.game = {
+        model,
+        view,
+        controller,
+        // Quick-access helpers
+        hire: (empId) => model.hireEmployee(model.getActivePlayerId(), empId),
+        assign: (instanceId, parentNode) => model.assignEmployee(model.getActivePlayerId(), instanceId, parentNode),
+        train: (instanceId, targetId) => model.trainEmployee(model.getActivePlayerId(), instanceId, targetId),
+        sell: (items, isGarden) => model.processSale(model.getActivePlayerId(), items, isGarden),
+        nextPhase: () => model.nextPhase(),
+        nextPlayer: () => model.nextPlayer(),
+        state: () => console.log(JSON.stringify(model.state, null, 2)),
+        player: (id) => model.getPlayer(id || model.getActivePlayerId()),
+    };
 
-    console.log('✅ Game initialized (MVC Architecture)');
-    console.log('📦 Model:      window.game.model');
-    console.log('🎨 View:       window.game.view');
-    console.log('🎮 Controller: window.game.controller');
-    console.log('');
-    console.log('💡 Keyboard shortcuts:');
-    console.log('   H - Open hiring menu');
-    console.log('   Enter - End turn');
-    console.log('   Escape - Close modals');
+    console.log('%c🍔 Food Chain Magnate Online', 'font-size: 1.4em; font-weight: bold; color: #BF4646;');
+    console.log('Debug: window.game.model / .view / .controller');
+    console.log('Shortcuts: game.hire("kitchen_trainee"), game.nextPhase(), game.state()');
 });
-
-// Debug helpers (globally accessible)
-function produceFood(type) {
-    const model = window.game.model;
-    const player = model.getCurrentPlayer();
-    model.produceFood(player.id, type);
-    window.game.view.updateDashboard(player);
-    window.game.view.showNotification(`Produced ${type}!`);
-}
-
-function addMoney(amount) {
-    const player = window.game.model.getCurrentPlayer();
-    player.money += amount;
-    window.game.view.updateDashboard(player);
-    window.game.view.showNotification(`Added $${amount}!`);
-}
-
-console.log('💡 Debug commands:');
-console.log('   produceFood("burgers") / produceFood("pizza") / produceFood("drinks")');
-console.log('   addMoney(50)');
