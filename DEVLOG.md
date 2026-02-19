@@ -350,4 +350,93 @@ Hora de codar. 🍔
 
 **Stack:** `HTML` · `CSS` · `JavaScript` · `MVC` · `Node.js` · `Socket.io` (planejado)
 
+
+---
+
+## Entry #3 — Roadmap & Prioritization (February 18, 2026)
+
+### Status Check
+After auditing the current codebase and rules documentation, I’ve established a prioritized roadmap. The goal is to tackle **"Quick Wins"** (visual feedback) first to maintain momentum, followed by the complex game logic required for a playable MVP.
+
+### The Roadmap
+
+1. **Drink Visuals**
+   - **Complexity:** 🟢 Low | **Impact:** Medium
+   - Separate the generic "Drinks" counter into individual 🍺 Beer, 🥤 Coke, and 🍋 Lemonade icons.
+2. **UI Polish**
+   - **Complexity:** 🟢 Low | **Impact:** Low
+   - Milestone badges and better notification animations.
+3. **Manual Turn Choice**
+   - **Complexity:** 🟡 Medium | **Impact:** Medium
+   - Interactivity for the *Order of Business* phase.
+4. **Bank Reserve**
+   - **Complexity:** 🟡 Medium | **Impact:** High
+   - Ending game triggers and setup choices.
+5. **Expansion Support**
+   - **Complexity:** 🟡 Medium | **Impact:** Medium
+   - Adding *The Ketchup Mechanism* cards and effects.
+6. **Visual OrgChart**
+   - **Complexity:** 🟠 High | **Impact:** Medium-High
+   - Moving from an indented list to a full SVG/Canvas tree with curved connection lines.
+7. **Marketing, Map & Dinnertime**
+   - **Complexity:** 🔴 High | **Impact:** Critical
+   - Implementing `MarketingResolver.js`, BFS pathfinding, and the core `DinnertimeResolver.js`.
+
+**Next**: Implementing specific icons for the inventory so players can tell their beer from their lemonade. 
+
+### 💬 Real talk...
+
+Since today was Sunday (and we're in the peak of Carnival!), I was busy recovering from a massive Brazilian feijoada, so I pretty much just took a small peek at the roadmap and that's it. But focusing on the roadmap today was a necessary "ego check." With my background in UX design, I know that getting the visual feedback right early on is crucial for the developer experience too. It's tempting to jump straight into the BFS pathfinding...
+
+Splitting the generic drinks into Coke, Beer, and Lemonade sounds simple, but it's the first step in making the player dashboard feel like a real game and not just a spreadsheet. Better to have a pretty, functional UI while I'm smashing my head against the pathfinding logic later this week.
+
+---
+
+**Stack:** `HTML` · `CSS` · `JavaScript` · `MVC` · `Node.js` · `Socket.io` (planned)
+
+`#gamedev` `#boardgames` `#javascript` `#indiedev` `#foodchainmagnate` `#devdiary`
+
+---
+
+## Entrada #3 — Roadmap & Priorização (18 de Fevereiro de 2026) 🇧🇷
+
+### Ponto de Situação
+Após auditar o código atual e a especificação de regras, estabeleci um roadmap priorizado. O objetivo é focar em **"Quick Wins"** (feedback visual) primeiro para manter o ritmo, seguidos pela lógica complexa necessária para um MVP jogável.
+
+### O Roadmap
+
+1. **Visual de Bebidas**
+   - **Complexidade:** 🟢 Baixa | **Impacto:** Médio
+   - Separar o contador genérico de "Drinks" em ícones individuais de 🍺 Cerveja, 🥤 Coca e 🍋 Limonada.
+2. **Polimento de UI**
+   - **Complexidade:** 🟢 Baixa | **Impacto:** Baixo
+   - Badges de milestone e melhores animações de notificação.
+3. **Escolha Manual de Turno**
+   - **Complexidade:** 🟡 Média | **Impacto:** Médio
+   - Interatividade para a fase *Order of Business*.
+4. **Reserva do Banco**
+   - **Complexidade:** 🟡 Média | **Impacto:** Alta
+   - Gatilhos de fim de jogo e escolhas iniciais.
+5. **Suporte à Expansão**
+   - **Complexidade:** 🟡 Média | **Impacto:** Médio
+   - Adicionando cartas e efeitos de *The Ketchup Mechanism*.
+6. **Organograma Visual**
+   - **Complexidade:** 🟠 Alta | **Impacto:** Médio-Alto
+   - Migrar da lista indentada para uma árvore SVG/Canvas completa com conexões curvas.
+7. **Marketing, Mapa e Jantar**
+   - **Complexidade:** 🔴 Alta | **Impacto:** Crítico
+   - Implementar o `MarketingResolver.js`, pathfinding BFS e o núcleo do `DinnertimeResolver.js`.
+
+**Próximo Passo**: Implementar os ícones específicos no inventário para que os jogadores possam diferenciar sua cerveja da sua limonada.
+
+### 💬 Na real...
+
+Como hoje foi domingo (e estamos em pleno Carnaval!), eu fui comer uma feijoada brasileira e simplesmente só dei uma pequena olhada no roadmap e é isso. Mas focar no roadmap hoje foi um "banho de realidade" necessário. Com meu background em UX design, eu sei que acertar no feedback visual logo no começo é crucial também para a "experiência do desenvolvedor". É tentador pular direto pro pathfinding BFS do mapa ou pra lógica de resolução do Jantar, mas é lá que moram os bugs mais cabulosos. Priorizando essas tarefas visuais e de UI menores primeiro, estou construindo um ambiente de debug muito melhor pra mim mesmo.
+
+Separar as bebidas genéricas em Coca, Cerveja e Limonada parece simples, mas é o primeiro passo pra fazer o dashboard do jogador parecer um jogo de verdade e não só uma planilha. Melhor ter uma UI bonita e funcional enquanto eu estiver quebrando a cabeça com a lógica de navegação no final da semana.
+
+---
+
+**Stack:** `HTML` · `CSS` · `JavaScript` · `MVC` · `Node.js` · `Socket.io` (planejado)
+
 `#gamedev` `#boardgames` `#javascript` `#indiedev` `#foodchainmagnate` `#devdiary`
