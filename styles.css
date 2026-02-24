@@ -480,6 +480,103 @@ h6 {
     font-weight: 600;
 }
 
+/* Per-item accent colours */
+.inventory-items .item[data-item="burger"] {
+    border-left-color: var(--diner-red);
+}
+
+.inventory-items .item[data-item="pizza"] {
+    border-left-color: var(--success);
+}
+
+.inventory-items .item[data-item="beer"] {
+    border-left-color: #D4A843;
+}
+
+.inventory-items .item[data-item="coke"] {
+    border-left-color: var(--retro-teal);
+}
+
+.inventory-items .item[data-item="lemonade"] {
+    border-left-color: #C8B400;
+}
+
+/* ─── Milestones Section ─── */
+.milestones-section h4 {
+    color: var(--warning);
+    font-size: 0.95rem;
+    margin-bottom: var(--space-sm);
+}
+
+.milestone-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    min-height: 32px;
+}
+
+.no-milestones {
+    font-size: 0.8rem;
+    color: var(--warm-gray);
+    font-style: italic;
+    align-self: center;
+}
+
+/* Category colours for milestone badges */
+.milestone-badge[data-cat="kitchen"] {
+    background: #4CAF50;
+    color: #fff;
+    border-color: #388E3C;
+}
+
+.milestone-badge[data-cat="marketing"] {
+    background: #2196F3;
+    color: #fff;
+    border-color: #1565C0;
+}
+
+.milestone-badge[data-cat="finance"] {
+    background: var(--warning);
+    color: var(--charcoal);
+    border-color: #B8922E;
+}
+
+.milestone-badge[data-cat="logistics"] {
+    background: #8BC34A;
+    color: var(--charcoal);
+    border-color: #558B2F;
+}
+
+.milestone-badge[data-cat="service"] {
+    background: #9C27B0;
+    color: #fff;
+    border-color: #6A1B9A;
+}
+
+.milestone-badge[data-cat="pricing"] {
+    background: #E91E63;
+    color: #fff;
+    border-color: #880E4F;
+}
+
+.milestone-badge[data-cat="training"] {
+    background: var(--retro-teal);
+    color: #fff;
+    border-color: var(--retro-teal-dark);
+}
+
+.milestone-badge[data-cat="recruiting"] {
+    background: var(--warm-gray);
+    color: #fff;
+    border-color: var(--charcoal-light);
+}
+
+.milestone-badge[data-cat="management"] {
+    background: var(--charcoal-light);
+    color: #fff;
+    border-color: var(--charcoal);
+}
+
 /* ─── Buttons ─── */
 .btn-primary,
 .btn-secondary {

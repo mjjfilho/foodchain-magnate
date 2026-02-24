@@ -19,9 +19,12 @@ class GameView {
             playerMoney: document.getElementById('player-money'),
             burgerCount: document.getElementById('burger-count'),
             pizzaCount: document.getElementById('pizza-count'),
-            drinkCount: document.getElementById('drink-count'),
+            beerCount: document.getElementById('beer-count'),
+            cokeCount: document.getElementById('coke-count'),
+            lemonadeCount: document.getElementById('lemonade-count'),
             orgChartTree: document.getElementById('org-chart-tree'),
             beachEmployees: document.getElementById('beach-employees'),
+            milestoneBadges: document.getElementById('milestone-badges'),
 
             // Modals
             cardShopModal: document.getElementById('card-shop-modal'),
@@ -77,13 +80,11 @@ class GameView {
 
     updateDashboard(player) {
         this.elements.playerMoney.textContent = player.money;
-
         this.elements.burgerCount.textContent = player.inventory.burger;
         this.elements.pizzaCount.textContent = player.inventory.pizza;
-
-        // Combine all drinks for display
-        const totalDrinks = player.inventory.beer + player.inventory.coke + player.inventory.lemonade;
-        this.elements.drinkCount.textContent = totalDrinks;
+        this.elements.beerCount.textContent = player.inventory.beer;
+        this.elements.cokeCount.textContent = player.inventory.coke;
+        this.elements.lemonadeCount.textContent = player.inventory.lemonade;
     }
 
     // ═══════════════════════════════════════════
@@ -327,8 +328,46 @@ class GameView {
     // ═══════════════════════════════════════════
 
     renderMilestones(milestonesOwned) {
-        // We'll render milestone badges inline — for now just show in console
-        // Full milestone panel will come with UI polish
+        const container = this.elements.milestoneBadges;
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!milestonesOwned || milestonesOwned.length === 0) {
+            container.innerHTML = '<span class="no-milestones">— None yet —</span>';
+            return;
+        }
+
+        // Human-readable labels and categories for each milestone
+        const MILESTONE_META = {
+            first_train: { label: 'First to Train', cat: 'training' },
+            first_hire_3: { label: 'First to Hire 3', cat: 'recruiting' },
+            first_pay_20_salary: { label: 'Pay $20 Salary', cat: 'finance' },
+            first_waitress: { label: 'First Waitress', cat: 'service' },
+            first_20_cash: { label: 'First $20', cat: 'finance' },
+            first_100_cash: { label: 'First $100', cat: 'finance' },
+            first_errand_boy: { label: 'First Errand Boy', cat: 'logistics' },
+            first_cart_operator: { label: 'First Cart Operator', cat: 'logistics' },
+            first_burger_produced: { label: 'First Burger', cat: 'kitchen' },
+            first_pizza_produced: { label: 'First Pizza', cat: 'kitchen' },
+            first_throw_away: { label: 'First to Waste', cat: 'management' },
+            first_lower_prices: { label: 'First to Lower Prices', cat: 'pricing' },
+            first_burger_marketed: { label: 'Burger Marketer', cat: 'marketing' },
+            first_pizza_marketed: { label: 'Pizza Marketer', cat: 'marketing' },
+            first_drink_marketed: { label: 'Drink Marketer', cat: 'marketing' },
+            first_billboard: { label: 'First Billboard', cat: 'marketing' },
+            first_airplane: { label: 'First Airplane', cat: 'marketing' },
+            first_radio: { label: 'First Radio', cat: 'marketing' },
+        };
+
+        for (const milestoneId of milestonesOwned) {
+            const meta = MILESTONE_META[milestoneId] || { label: milestoneId, cat: 'management' };
+            const badge = document.createElement('span');
+            badge.className = 'milestone-badge';
+            badge.dataset.cat = meta.cat;
+            badge.title = milestoneId; // tooltip with raw ID for debugging
+            badge.textContent = `🏆 ${meta.label}`;
+            container.appendChild(badge);
+        }
     }
 
     // ═══════════════════════════════════════════

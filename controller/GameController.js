@@ -62,6 +62,9 @@ class GameController {
             (entry) => this._onBeachClick(entry)
         );
 
+        // Milestones
+        this.view.renderMilestones(player.milestonesOwned);
+
         // Map (placeholder)
         this.view.renderMap((row, col) => this._onCellClick(row, col));
 
