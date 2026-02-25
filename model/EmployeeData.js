@@ -380,9 +380,9 @@ const EMPLOYEES = {
         action: {
             type: ACTION_TYPES.MARKET,
             tileTypes: ['billboard'],
-            duration: 'permanent',
+            duration: 'permanent', // This is still the technical duration for now, but rule interpretation is being revised
             mandatory: true,
-            description: 'Places 1 billboard (permanent). Mandatory.',
+            description: 'Places 1 billboard. Mandatory.',
         },
     },
 

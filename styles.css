@@ -480,6 +480,27 @@ h6 {
     font-weight: 600;
 }
 
+/* ─── Phase Tip ─── */
+.phase-tip {
+    background: rgba(126, 172, 181, 0.15);
+    border: 1px solid var(--retro-teal-light);
+    border-left: 4px solid var(--retro-teal);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.82rem;
+    color: var(--charcoal-light);
+    line-height: 1.5;
+    min-height: 0;
+}
+
+.phase-tip:empty {
+    display: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
 /* Per-item accent colours */
 .inventory-items .item[data-item="burger"] {
     border-left-color: var(--diner-red);
@@ -579,7 +600,8 @@ h6 {
 
 /* ─── Buttons ─── */
 .btn-primary,
-.btn-secondary {
+.btn-secondary,
+.btn-teal {
     width: 100%;
     padding: var(--space-md);
     font-size: 1rem;
@@ -642,6 +664,327 @@ h6 {
     background: var(--retro-teal-light);
     transform: translateY(-2px);
     box-shadow: 0 6px 0 var(--retro-teal-dark), var(--shadow-md);
+}
+
+/* ─── Info Buttons (sidebar) ─── */
+.info-buttons {
+    display: flex;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+}
+
+.btn-info {
+    flex: 1;
+    padding: var(--space-sm);
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--off-white);
+    color: var(--charcoal);
+    border: 2px solid var(--warm-gray-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-info:hover {
+    background: var(--warm-cream);
+    border-color: var(--warning);
+    transform: translateY(-1px);
+}
+
+/* ─── Modal variants ─── */
+.modal-wide {
+    max-width: 960px;
+}
+
+.modal-fullwidth {
+    max-width: 98vw;
+    width: 98vw;
+}
+
+.modal-subtitle {
+    text-align: center;
+    color: var(--warm-gray);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-md);
+}
+
+/* ─── Milestone Viewer ─── */
+.milestone-legend {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: center;
+    margin-bottom: var(--space-lg);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.milestone-viewer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.ms-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--warm-gray-light);
+    background: var(--off-white);
+    transition: transform 0.15s ease;
+}
+
+.ms-card:hover {
+    transform: translateY(-2px);
+}
+
+.ms-card.ms-claimed {
+    border-color: var(--success);
+    background: rgba(107, 155, 79, 0.08);
+}
+
+.ms-card.ms-available {
+    border-color: var(--warm-gray-light);
+    opacity: 0.85;
+}
+
+.ms-card.ms-unavailable {
+    border-color: #ddd;
+    opacity: 0.45;
+    filter: grayscale(0.5);
+}
+
+.ms-state-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.ms-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ms-label {
+    font-size: 0.9rem;
+    color: var(--charcoal);
+}
+
+.ms-desc {
+    font-size: 0.78rem;
+    color: var(--warm-gray);
+}
+
+.ms-owner {
+    font-size: 0.78rem;
+    color: var(--success);
+    font-weight: 700;
+}
+
+.ms-cat-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: var(--radius-pill);
+    background: var(--warm-cream);
+    color: var(--charcoal-light);
+    white-space: nowrap;
+    align-self: flex-start;
+}
+
+/* ─── Career Path (trilha por branch) ─── */
+.career-tree-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    overflow-y: auto;
+    max-height: 80vh;
+    padding: var(--space-lg) var(--space-md) var(--space-xl) var(--space-md);
+}
+
+/* Uma lane = uma linha horizontal (branch inteira) */
+.cp-lane {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 140px;
+    border-left: 8px solid var(--branch-color, var(--warm-gray));
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.03);
+}
+
+/* Rótulo esquerdo da lane */
+.cp-lane-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 100px;
+    max-width: 100px;
+    padding: var(--space-md);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--branch-color, var(--charcoal));
+    text-align: center;
+    border-right: 2px solid var(--warm-gray-light);
+}
+
+.cp-lane-icon {
+    font-size: 1.8rem;
+}
+
+/* O trilho de cards dentro da lane */
+.cp-track {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    overflow-x: auto;
+    padding: var(--space-lg) var(--space-xl);
+    flex: 1;
+    scrollbar-width: thin;
+}
+
+/* Card individual na trilha */
+.cp-card {
+    flex: 0 0 auto;
+    width: 200px;
+    min-height: 110px;
+    background: var(--off-white);
+    border: 3px solid var(--warm-gray-light);
+    border-top: 6px solid var(--branch-color, var(--warm-gray));
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    font-size: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cp-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-color: var(--branch-color);
+}
+
+.cp-card.cp-1x {
+    box-shadow: 0 0 0 2px var(--warning);
+}
+
+.cp-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.cp-card-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--charcoal);
+    line-height: 1.1;
+    flex: 1;
+}
+
+.cp-badge {
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    background: var(--warning);
+    color: var(--charcoal);
+    display: inline-block;
+}
+
+.cp-card-foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: var(--space-xs);
+}
+
+.cp-salary-icon {
+    font-size: 1.2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0);
+    }
+
+    50% {
+        transform: translateY(-3px) rotate(10deg);
+    }
+}
+
+.cp-card-action {
+    font-size: 0.8rem;
+    color: var(--charcoal-light);
+    line-height: 1.4;
+    margin: 4px 0;
+}
+
+/* Seta → conectora entre cards na mesma lane */
+.cp-arrow {
+    flex: 0 0 auto;
+    padding: 0 var(--space-md);
+    font-size: 1.8rem;
+    color: var(--branch-color, var(--warm-gray));
+    font-weight: 900;
+    user-select: none;
+    line-height: 1;
+    opacity: 0.6;
+}
+
+/* Espaçador entre cards desconectados na mesma lane */
+.cp-spacer {
+    flex: 0 0 60px;
+    height: 3px;
+    background: repeating-linear-gradient(90deg,
+            var(--warm-gray-light) 0 10px,
+            transparent 10px 20px);
+    align-self: center;
+    margin: 0 var(--space-lg);
+    opacity: 0.4;
+}
+
+/* Supply status reutilizado */
+.supply-ok {
+    color: var(--success);
+}
+
+.supply-scarce {
+    color: var(--warning);
+}
+
+.supply-empty {
+    color: var(--danger);
+    text-decoration: line-through;
 }
 
 /* ─── Modal ─── */

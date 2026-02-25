@@ -68,6 +68,10 @@ class GameController {
         // Map (placeholder)
         this.view.renderMap((row, col) => this._onCellClick(row, col));
 
+        // Phase tip + hire button
+        this.view.updatePhaseTip(this.model.getPhase());
+        this.view.setHireBtnVisible(this.model.getPhase() === 'working');
+
         // Update button text based on phase
         this._updateActionButton();
     }
@@ -108,6 +112,18 @@ class GameController {
             this._selectedBeachEmployee = null;
         });
 
+        // Hire button
+        const hireBtn = this.view.elements.hireBtn;
+        if (hireBtn) {
+            hireBtn.addEventListener('click', () => this._openHiringModal());
+        }
+
+        // Info buttons
+        document.getElementById('milestones-btn')?.addEventListener('click', () => this._openMilestoneViewer());
+        document.getElementById('career-tree-btn')?.addEventListener('click', () => this._openCareerTreeModal());
+        document.getElementById('close-milestone-viewer-btn')?.addEventListener('click', () => this.view.hideMilestoneViewer());
+        document.getElementById('close-career-tree-btn')?.addEventListener('click', () => this.view.hideCareerTreeModal());
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'h' || e.key === 'H') {
@@ -115,6 +131,8 @@ class GameController {
             } else if (e.key === 'Escape') {
                 this.view.hideHiringModal();
                 this.view.hideTrainingModal();
+                this.view.hideMilestoneViewer();
+                this.view.hideCareerTreeModal();
                 this._selectedBeachEmployee = null;
             } else if (e.key === 'Enter') {
                 this._onEndPhase();
@@ -292,6 +310,28 @@ class GameController {
         if (phase === 'working') {
             this._openTrainingModal(entry);
         }
+    }
+
+    // ═══════════════════════════════════════════
+    // INFO MODALS
+    // ═══════════════════════════════════════════
+
+    _openMilestoneViewer() {
+        const rawMilestones = this.model.state?.milestones || {};
+        const players = this.model.state?.players || {};
+        const beginnerMode = this.model.state?.beginnerMode || false;
+
+        // Convert internal { claimed, claimedBy } → simple { milestoneId: ownerId | null }
+        const milestonesMap = {};
+        for (const [id, ms] of Object.entries(rawMilestones)) {
+            milestonesMap[id] = ms.claimed ? ms.claimedBy[0] : null;
+        }
+
+        this.view.showMilestoneViewer(milestonesMap, players, beginnerMode);
+    }
+
+    _openCareerTreeModal() {
+        this.view.showCareerTreeModal((empId) => this.model.getSupply(empId));
     }
 
     // ═══════════════════════════════════════════

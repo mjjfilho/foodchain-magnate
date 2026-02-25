@@ -1,5 +1,41 @@
 # 🍔 Dev Diary — Food Chain Magnate Online
 
+## Entry #4 — Information Overload & UI Refinement (February 24-25, 2026)
+
+### Phase 2: Information Centers
+Implemented dedicated modals for heavy-duty game data to keep the main dashboard clean:
+
+- **Milestone Viewer**: A full-grid view of all 18 milestones. States: Claimed (with owner tag), Available, and Unavailable (beginner mode restrictions).
+- **Career Path (The Trail)**: Reimagined the career tree. Instead of a vertical list, it's now a **horizontal path layout** with lanes per branch.
+    - **Visual Connectors**: Used SVG-like logic in CSS to create arrows (→) between steps in a career.
+    - **Minimalism**: Cleaned up the cards by removing redundant supply counts and "cross-branch" text.
+    - **Salary Indicators**: Replaced text badges with a dynamic **💸 (Flying Money)** emoji for any employee that costs $5/turn.
+
+### Phase 3: Rule Polish
+- **Marketing Trainee**: Corrected rules regarding billboard duration (removed the "permanent" tag from the UI as it was misleading).
+- **UX**: Massive increase in "white space" (airiness) within modals. The Career Path now uses an XL-gap layout to feel more like a premium board game interface.
+
+**Next**: Map interaction and Dinnertime resolution.
+
+---
+
+## Entrada #4 — Centro de Informações & Refinamento de UX (24-25 de Fevereiro de 2026) 🇧🇷
+
+### Fase 2: Centrais de Informação
+Implementamos modais dedicados para dados densos, mantendo o dashboard principal limpo:
+
+- **Milestone Viewer**: Visão em grid de todos os 18 milestones. Estados: Conquistado (com dono), Disponível e Indisponível (modo iniciante).
+- **Career Path (A Trilha)**: Reimaginamos a árvore de carreira. Em vez de lista vertical, agora é um **layout de trilha horizontal** com "lanes" por departamento.
+    - **Conectores Visuais**: Setas (→) indicam a progressão direta de treinamento.
+    - **Minimalismo**: Limpamos os cards removendo contagem de supply e textos de ramificações cruzadas.
+    - **Indicador de Salário**: Substituímos badges de texto pelo emoji **💸 (Dinheiro Voando)** em cargos que custam $5.
+
+### Fase 3: Polimento de Regras
+- **Marketing Trainee**: Corrigida a descrição da ação (removido o "permanent" que estava confuso na UI).
+- **UX**: Aumento drástico no "respiro" visual. A trilha de carreira agora usa espaçamentos XL para parecer uma interface de board game premium.
+
+**Próximo**: Interação com o mapa e resolução do Jantar (Dinnertime).
+
 ---
 
 ## Entry #2 — Game Engine Foundation (February 17, 2026)

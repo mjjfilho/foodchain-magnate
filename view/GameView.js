@@ -34,6 +34,13 @@ class GameView {
 
             // Actions
             endTurnBtn: document.getElementById('end-turn-btn'),
+            hireBtn: document.getElementById('hire-btn'),
+            phaseTip: document.getElementById('phase-tip'),
+            // Info modals
+            milestoneViewerModal: document.getElementById('milestone-viewer-modal'),
+            milestoneViewerGrid: document.getElementById('milestone-viewer-grid'),
+            careerTreeModal: document.getElementById('career-tree-modal'),
+            careerTreeGrid: document.getElementById('career-tree-grid'),
         };
     }
 
@@ -72,6 +79,33 @@ class GameView {
 
     updateBank(bankAmount) {
         this.elements.bankBalance.textContent = `🏦 Bank: $${bankAmount}`;
+    }
+
+    /**
+     * Show/hide the Hire button based on current phase
+     */
+    setHireBtnVisible(visible) {
+        const btn = this.elements.hireBtn;
+        if (!btn) return;
+        btn.classList.toggle('hidden', !visible);
+    }
+
+    /**
+     * Show a contextual tip for the current phase
+     */
+    updatePhaseTip(phase) {
+        const tips = {
+            restructuring: '📄 Restructuring — assign or remove employees from the org chart. Click a chart node to send back to beach; click an empty slot to assign.',
+            order_of_business: '📊 Order of Business — turn order is determined automatically (most open org slots goes first). Press End Phase to continue.',
+            working: '💼 Working 9-5 — hire new employees or train beach employees. Use the “Hire” button or press H. Click a beach employee to train them.',
+            dinnertime: '🍽️ Dinnertime — restaurants sell food to houses. (Automated for now — map system coming soon.)',
+            payday: '💰 Payday — salaries are paid automatically. You may fire employees before paying by using the console.',
+            marketing_campaigns: '📣 Marketing — place marketing pieces to generate demand tokens for next turn. (Coming soon.)',
+            cleanup: '🧹 Cleanup — unsold food is discarded (unless you have a freezer). Starting next turn!',
+        };
+        const tip = this.elements.phaseTip;
+        if (!tip) return;
+        tip.textContent = tips[phase] || '';
     }
 
     // ═══════════════════════════════════════════
@@ -324,7 +358,189 @@ class GameView {
     }
 
     // ═══════════════════════════════════════════
-    // MILESTONES
+    // MILESTONE VIEWER
+    // ═══════════════════════════════════════════
+
+    showMilestoneViewer(milestonesMap, players, beginnerMode = false) {
+        const grid = this.elements.milestoneViewerGrid;
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        // All milestones with metadata
+        const ALL_MILESTONES = [
+            { id: 'first_hire_3', label: 'First to Hire 3', desc: 'Hire 3 employees total.', cat: 'recruiting' },
+            { id: 'first_train', label: 'First to Train', desc: 'Train any employee.', cat: 'training' },
+            { id: 'first_waitress', label: 'First Waitress', desc: 'Hire a Waitress.', cat: 'service' },
+            { id: 'first_errand_boy', label: 'First Errand Boy', desc: 'Hire an Errand Boy.', cat: 'logistics' },
+            { id: 'first_cart_operator', label: 'First Cart Operator', desc: 'Train to Cart Operator.', cat: 'logistics' },
+            { id: 'first_burger_produced', label: 'First Burger Produced', desc: 'Produce at least 1 burger.', cat: 'kitchen' },
+            { id: 'first_pizza_produced', label: 'First Pizza Produced', desc: 'Produce at least 1 pizza.', cat: 'kitchen' },
+            { id: 'first_20_cash', label: 'First $20', desc: 'Reach $20 in cash.', cat: 'finance' },
+            { id: 'first_100_cash', label: 'First $100', desc: 'Reach $100 in cash.', cat: 'finance' },
+            { id: 'first_pay_20_salary', label: 'Pay $20 Salary', desc: 'Pay $20+ in salaries one turn.', cat: 'finance' },
+            { id: 'first_lower_prices', label: 'First to Lower Prices', desc: 'Have a Discount/Pricing Manager.', cat: 'pricing' },
+            { id: 'first_burger_marketed', label: 'Burger Marketer', desc: 'Place a burger marketing tile.', cat: 'marketing' },
+            { id: 'first_pizza_marketed', label: 'Pizza Marketer', desc: 'Place a pizza marketing tile.', cat: 'marketing' },
+            { id: 'first_drink_marketed', label: 'Drink Marketer', desc: 'Place a drink marketing tile.', cat: 'marketing' },
+            { id: 'first_billboard', label: 'First Billboard', desc: 'Place a billboard.', cat: 'marketing' },
+            { id: 'first_airplane', label: 'First Airplane', desc: 'Place an airplane tile.', cat: 'marketing' },
+            { id: 'first_radio', label: 'First Radio', desc: 'Place a radio tile.', cat: 'marketing' },
+            { id: 'first_throw_away', label: 'First to Waste Food', desc: 'Discard unsold food at Cleanup.', cat: 'management' },
+        ];
+
+        // Milestones unavailable in beginner mode
+        const BEGINNER_LOCKED = ['first_airplane', 'first_radio', 'first_billboard'];
+
+        for (const ms of ALL_MILESTONES) {
+            const ownerId = milestonesMap ? milestonesMap[ms.id] : null;
+            const isUnavailable = beginnerMode && BEGINNER_LOCKED.includes(ms.id);
+
+            let state, icon, ownerLabel = '';
+            if (isUnavailable) {
+                state = 'unavailable'; icon = '\u274C';
+            } else if (ownerId) {
+                state = 'claimed'; icon = '\u2705';
+                const owner = players ? players[ownerId] : null;
+                ownerLabel = owner ? owner.name : ownerId;
+            } else {
+                state = 'available'; icon = '\u25EF';
+            }
+
+            const card = document.createElement('div');
+            card.className = `ms-card ms-${state}`;
+            card.dataset.cat = ms.cat;
+            card.innerHTML = `
+                <span class="ms-state-icon">${icon}</span>
+                <div class="ms-info">
+                    <strong class="ms-label">${ms.label}</strong>
+                    <span class="ms-desc">${ms.desc}</span>
+                    ${ownerLabel ? `<span class="ms-owner">👤 ${ownerLabel}</span>` : ''}
+                </div>
+                <span class="ms-cat-tag">${ms.cat}</span>
+            `;
+            grid.appendChild(card);
+        }
+
+        this.elements.milestoneViewerModal.classList.remove('hidden');
+    }
+
+    hideMilestoneViewer() {
+        this.elements.milestoneViewerModal.classList.add('hidden');
+    }
+
+    // ═══════════════════════════════════════════
+    // CAREER TREE MODAL
+    // ═══════════════════════════════════════════
+
+    showCareerTreeModal(getSupplyFn) {
+        const grid = this.elements.careerTreeGrid;
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        if (typeof EMPLOYEES === 'undefined' || typeof BRANCHES === 'undefined') {
+            grid.innerHTML = '<p>Employee data not available.</p>';
+            this.elements.careerTreeModal.classList.remove('hidden');
+            return;
+        }
+
+        // ─── Build a map of branchId → employees (sorted by level) ───
+        const byBranch = {};
+        const empMap = EMPLOYEES; // shorthand
+
+        for (const emp of Object.values(empMap)) {
+            if (!byBranch[emp.branch]) byBranch[emp.branch] = [];
+            byBranch[emp.branch].push(emp);
+        }
+        for (const b of Object.keys(byBranch)) {
+            byBranch[b].sort((a, b) => a.level - b.level);
+        }
+
+        // ─── Render one lane (row) per branch ───
+        const BRANCH_ORDER = [
+            'management', 'executive', 'kitchen', 'logistics',
+            'marketing', 'pricing', 'restaurant',
+            'recruiting', 'training', 'service', 'finance',
+        ];
+
+        const branchesToRender = [
+            ...BRANCH_ORDER.filter(b => byBranch[b]),
+            ...Object.keys(byBranch).filter(b => !BRANCH_ORDER.includes(b)),
+        ];
+
+        for (const branchId of branchesToRender) {
+            const emps = byBranch[branchId];
+            if (!emps || emps.length === 0) continue;
+
+            const branchDef = BRANCHES[branchId] || { label: branchId, color: '#999', icon: '?' };
+
+            // ── Lane wrapper ──
+            const lane = document.createElement('div');
+            lane.className = 'cp-lane';
+            lane.style.setProperty('--branch-color', branchDef.color);
+
+            // ── Lane label (leftmost) ──
+            const label = document.createElement('div');
+            label.className = 'cp-lane-label';
+            label.innerHTML = `<span class="cp-lane-icon">${branchDef.icon}</span><span>${branchDef.label}</span>`;
+            lane.appendChild(label);
+
+            // ── Track: cards + connectors ──
+            const track = document.createElement('div');
+            track.className = 'cp-track';
+
+            for (let i = 0; i < emps.length; i++) {
+                const emp = emps[i];
+
+                const samePromotions = emp.promotesTo.filter(tid => {
+                    const target = empMap[tid];
+                    return target && target.branch === branchId;
+                });
+
+                // ── Card ──
+                const card = document.createElement('div');
+                card.className = 'cp-card';
+                if (emp.is1x) card.classList.add('cp-1x');
+
+                card.innerHTML = `
+                    <div class="cp-card-top">
+                        <span class="cp-card-name">${emp.name}</span>
+                        ${emp.salary > 0 ? '<span class="cp-salary-icon" title="Charges Salary">💸</span>' : ''}
+                    </div>
+                    <p class="cp-card-action">${emp.action?.description || '—'}</p>
+                    <div class="cp-card-foot">
+                        ${emp.is1x ? '<span class="cp-badge">1× Unique</span>' : ''}
+                    </div>
+                `;
+
+                track.appendChild(card);
+
+                // ── Arrow connector (between this card and the next in same branch) ──
+                if (samePromotions.length > 0 && i < emps.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'cp-arrow';
+                    arrow.textContent = samePromotions.length > 1 ? '⇒' : '→';
+                    track.appendChild(arrow);
+                } else if (i < emps.length - 1) {
+                    // Gap between unconnected cards in the same branch
+                    const spacer = document.createElement('div');
+                    spacer.className = 'cp-spacer';
+                    track.appendChild(spacer);
+                }
+            }
+
+            lane.appendChild(track);
+            grid.appendChild(lane);
+        }
+
+        this.elements.careerTreeModal.classList.remove('hidden');
+    }
+
+    hideCareerTreeModal() {
+        this.elements.careerTreeModal.classList.add('hidden');
+    }
+
+    // ═══════════════════════════════════════════
+    // MILESTONES (sidebar badges)
     // ═══════════════════════════════════════════
 
     renderMilestones(milestonesOwned) {

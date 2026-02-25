@@ -84,8 +84,18 @@
                     </div>
                 </div>
 
+                <!-- Phase Tip -->
+                <div id="phase-tip" class="phase-tip"></div>
+
                 <div class="actions">
+                    <button id="hire-btn" class="btn-teal hidden">🤝 Hire Employee</button>
                     <button id="end-turn-btn" class="btn-primary">End Phase</button>
+                </div>
+
+                <!-- Info Buttons -->
+                <div class="info-buttons">
+                    <button id="milestones-btn" class="btn-info">🏆 Milestones</button>
+                    <button id="career-tree-btn" class="btn-info">🌱 Career Tree</button>
                 </div>
             </aside>
 
@@ -119,6 +129,31 @@
                 <button id="close-training-btn" class="btn-secondary">Cancel</button>
             </div>
         </div>
+
+        <!-- Milestone Viewer Modal -->
+        <div id="milestone-viewer-modal" class="modal hidden">
+            <div class="modal-content modal-wide">
+                <h2>🏆 Milestones</h2>
+                <p class="modal-subtitle">Track which milestones have been claimed this game.</p>
+                <div class="milestone-legend">
+                    <span class="legend-item"><span class="ms-icon ms-claimed">✅</span> Claimed</span>
+                    <span class="legend-item"><span class="ms-icon ms-available">◯</span> Available</span>
+                    <span class="legend-item"><span class="ms-icon ms-unavailable">❌</span> Unavailable</span>
+                </div>
+                <div id="milestone-viewer-grid" class="milestone-viewer-grid"></div>
+                <button id="close-milestone-viewer-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+
+        <!-- Career Tree Modal -->
+        <div id="career-tree-modal" class="modal hidden">
+            <div class="modal-content modal-fullwidth">
+                <h2>🌱 Career Tree</h2>
+                <div id="career-tree-grid" class="career-tree-grid"></div>
+                <button id="close-career-tree-btn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- MVC Architecture -->
