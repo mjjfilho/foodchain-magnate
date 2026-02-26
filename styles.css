@@ -1228,3 +1228,411 @@ h6 {
         padding: var(--space-xs) var(--space-sm);
     }
 }
+
+/* ═══════════════════════════════════════════════════════
+   CAREER PROGRESSION MODAL — ct- prefix
+   Left-to-right tree, Mid-Century Diner aesthetic
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Overlay ─── */
+.ct-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(45, 41, 38, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-md);
+}
+
+/* ─── Modal container ─── */
+.ct-modal {
+    width: min(95vw, 980px);
+    height: min(90vh, 680px);
+    background: var(--off-white);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 60px rgba(45, 41, 38, 0.45), 0 0 0 4px var(--chrome), 0 0 0 6px var(--chrome-highlight);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ─── Header ─── */
+.ct-header {
+    background: var(--diner-red);
+    border-bottom: 4px solid var(--diner-red-dark);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* Chrome accent line below header */
+.ct-header::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right,
+            var(--chrome-shadow),
+            var(--chrome-highlight) 30%,
+            var(--chrome) 50%,
+            var(--chrome-highlight) 70%,
+            var(--chrome-shadow));
+    z-index: 1;
+}
+
+.ct-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ct-title {
+    font-family: 'Fredoka One', 'Nunito', cursive;
+    color: var(--off-white);
+    font-size: 1.35rem;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+    margin: 0;
+}
+
+.ct-subtitle {
+    color: rgba(255, 244, 234, 0.75);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.ct-close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: var(--off-white);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ct-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* ─── Body ─── */
+.ct-body {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    margin-top: 4px;
+    /* offset for chrome line */
+}
+
+/* ─── Tree area ─── */
+.ct-tree-area {
+    flex: 1;
+    overflow: auto;
+    padding: 28px 32px;
+}
+
+/* Scrollbar customizada */
+.ct-tree-area::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.ct-tree-area::-webkit-scrollbar-track {
+    background: var(--warm-cream);
+    border-radius: 4px;
+}
+
+.ct-tree-area::-webkit-scrollbar-thumb {
+    background: var(--warm-gray);
+    border-radius: 4px;
+}
+
+.ct-tree-area::-webkit-scrollbar-thumb:hover {
+    background: var(--warm-gray-light);
+}
+
+/* ─── Tree: left-to-right layout ─── */
+.ct-tree-root {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    min-height: 100%;
+}
+
+/* Uma "coluna" vertical de nós ao mesmo nível de profundidade */
+.ct-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Agrupa um nó + seus conectores + filhos  */
+.ct-node-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Empilha os filhos verticalmente, com conectores entre eles */
+.ct-children-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Wrapper de um nó individual: card + conector horizontal saindo à direita */
+.ct-node-slot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 0;
+}
+
+/* Conector vertical (liga irmãos) */
+.ct-conn-v {
+    width: 2px;
+    background: var(--chrome);
+    align-self: stretch;
+    margin-left: 59px;
+    /* metade da largura do card para centralizar */
+    flex-shrink: 0;
+}
+
+/* Conector horizontal: sai do card em direção aos filhos */
+.ct-conn-h {
+    height: 2px;
+    width: 24px;
+    background: var(--chrome);
+    flex-shrink: 0;
+}
+
+/* Conector vertical antes do card (de cima) */
+.ct-conn-branch {
+    height: 2px;
+    width: 20px;
+    background: var(--chrome);
+    flex-shrink: 0;
+}
+
+/* ─── Node card ─── */
+.ct-node-card {
+    width: 118px;
+    background: var(--off-white);
+    border: 2px solid var(--chrome);
+    border-radius: 10px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    font-family: 'Nunito', sans-serif;
+    flex-shrink: 0;
+    position: relative;
+    text-align: left;
+    border-left-width: 4px;
+}
+
+.ct-node-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.ct-card-name {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--charcoal);
+    line-height: 1.3;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ct-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin-top: 2px;
+    min-height: 16px;
+    /* reserva espaço fixo mesmo sem badges → altura uniforme nos cards */
+}
+
+.ct-badge-1x {
+    font-size: 0.6rem;
+    font-weight: 700;
+    background: var(--warm-cream);
+    border: 1px solid var(--chrome);
+    border-radius: 4px;
+    padding: 1px 4px;
+    color: var(--charcoal-light);
+    white-space: nowrap;
+}
+
+.ct-salary-icon {
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+/* Selected state: usa a cor da branch como variável inline */
+.ct-node-card.selected {
+    background: var(--ct-branch-color, var(--diner-red));
+    border-color: var(--ct-branch-color, var(--diner-red));
+    color: #fff;
+    transform: scale(1.07);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.ct-node-card.selected .ct-card-name {
+    color: #fff;
+}
+
+.ct-node-card.selected .ct-badge-1x {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #fff;
+}
+
+/* ─── Detail panel ─── */
+.ct-detail-panel {
+    width: 240px;
+    flex-shrink: 0;
+    border-left: 2px solid var(--chrome);
+    background: var(--warm-cream);
+    overflow-y: auto;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.ct-detail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: var(--space-sm);
+    color: var(--warm-gray);
+    text-align: center;
+    font-size: 0.85rem;
+    font-style: italic;
+    padding: var(--space-lg);
+}
+
+.ct-detail-empty-icon {
+    font-size: 2.2rem;
+    opacity: 0.6;
+}
+
+/* Detail panel sections */
+.ct-detail-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.05rem;
+    margin-bottom: 2px;
+}
+
+.ct-detail-salary {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--charcoal-light);
+    margin-bottom: 4px;
+}
+
+.ct-detail-section-title {
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: var(--warm-gray);
+    margin-top: 8px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--chrome);
+    padding-bottom: 3px;
+}
+
+.ct-detail-action {
+    font-size: 0.8rem;
+    color: var(--charcoal-light);
+    line-height: 1.4;
+}
+
+.ct-detail-chip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ct-detail-chip {
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--off-white);
+    border: 1px solid var(--chrome);
+    border-left-width: 3px;
+    border-radius: 6px;
+    padding: 3px 7px;
+    color: var(--charcoal);
+}
+
+.ct-detail-none {
+    font-size: 0.78rem;
+    color: var(--warm-gray);
+    font-style: italic;
+}
+
+/* ─── Footer ─── */
+.ct-footer {
+    background: var(--warm-cream);
+    border-top: 2px solid var(--chrome);
+    padding: 8px 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--space-md);
+}
+
+.ct-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.ct-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--charcoal-light);
+}
+
+.ct-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.ct-footer-selected {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--charcoal-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+}

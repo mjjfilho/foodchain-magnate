@@ -331,7 +331,7 @@ class GameController {
     }
 
     _openCareerTreeModal() {
-        this.view.showCareerTreeModal((empId) => this.model.getSupply(empId));
+        this.view.showCareerTreeModal();
     }
 
     // ═══════════════════════════════════════════

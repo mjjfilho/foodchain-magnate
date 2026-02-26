@@ -39,8 +39,13 @@ class GameView {
             // Info modals
             milestoneViewerModal: document.getElementById('milestone-viewer-modal'),
             milestoneViewerGrid: document.getElementById('milestone-viewer-grid'),
+            // Career tree (new overlay-based modal)
+            careerTreeOverlay: document.getElementById('career-tree-overlay'),
             careerTreeModal: document.getElementById('career-tree-modal'),
             careerTreeGrid: document.getElementById('career-tree-grid'),
+            ctDetailPanel: document.getElementById('ct-detail-panel'),
+            ctFooterSelected: document.getElementById('ct-footer-selected'),
+            ctLegend: document.getElementById('ct-legend'),
         };
     }
 
@@ -429,114 +434,267 @@ class GameView {
     }
 
     // ═══════════════════════════════════════════
-    // CAREER TREE MODAL
+    // CAREER TREE MODAL (left-to-right tree)
     // ═══════════════════════════════════════════
 
-    showCareerTreeModal(getSupplyFn) {
-        const grid = this.elements.careerTreeGrid;
-        if (!grid) return;
-        grid.innerHTML = '';
+    showCareerTreeModal() {
+        const { careerTreeGrid, careerTreeOverlay, ctDetailPanel, ctFooterSelected, ctLegend } = this.elements;
+        if (!careerTreeGrid) return;
 
         if (typeof EMPLOYEES === 'undefined' || typeof BRANCHES === 'undefined') {
-            grid.innerHTML = '<p>Employee data not available.</p>';
-            this.elements.careerTreeModal.classList.remove('hidden');
+            careerTreeGrid.innerHTML = '<p style="padding:16px">Employee data not available.</p>';
+            careerTreeOverlay.classList.remove('hidden');
             return;
         }
 
-        // ─── Build a map of branchId → employees (sorted by level) ───
-        const byBranch = {};
-        const empMap = EMPLOYEES; // shorthand
+        // ─── Reset state ───
+        this._selectedCareerCardId = null;
+        careerTreeGrid.innerHTML = '';
+        ctFooterSelected.textContent = 'Nenhum selecionado';
+        this._clearCareerDetailPanel();
 
-        for (const emp of Object.values(empMap)) {
-            if (!byBranch[emp.branch]) byBranch[emp.branch] = [];
-            byBranch[emp.branch].push(emp);
+        // ─── Build tree ───
+        // Find roots: employees with no promotesFrom (entry-level or orphan)
+        const roots = Object.values(EMPLOYEES).filter(e => e.promotesFrom.length === 0);
+
+        // Render each root as its own sub-tree
+        const treeRoot = document.createElement('div');
+        treeRoot.className = 'ct-tree-root';
+
+        // Render all roots stacked vertically in a single column wrapper
+        const rootsCol = document.createElement('div');
+        rootsCol.className = 'ct-column';
+        treeRoot.appendChild(rootsCol);
+
+        for (const emp of roots) {
+            const group = this._renderCareerNode(emp);
+            rootsCol.appendChild(group);
         }
-        for (const b of Object.keys(byBranch)) {
-            byBranch[b].sort((a, b) => a.level - b.level);
+
+        careerTreeGrid.appendChild(treeRoot);
+
+        // ─── Legend ───
+        this._renderCareerLegend();
+
+        // ─── Close on overlay click ───
+        careerTreeOverlay.onclick = (e) => {
+            if (e.target === careerTreeOverlay) this.hideCareerTreeModal();
+        };
+
+        careerTreeOverlay.classList.remove('hidden');
+    }
+
+    /**
+     * Returns the maximum depth of the subtree rooted at empId.
+     * Leaf nodes return 0.
+     */
+    _getSubtreeDepth(empId) {
+        const emp = EMPLOYEES[empId];
+        if (!emp || emp.promotesTo.length === 0) return 0;
+        return 1 + Math.max(...emp.promotesTo.map(id => this._getSubtreeDepth(id)));
+    }
+
+    /**
+     * Sorts children so the deepest subtree lands at the center index.
+     * This ensures align-items:center on the parent group aligns the parent card
+     * horizontally with the main-chain card, not the arithmetic midpoint of all children.
+     *
+     * Algorithm: sort by depth descending, place heaviest at center, then alternate
+     * left (above) and right (below) for the rest.
+     *
+     * Example with [NBD(0), LM(0), JVP(4)] → sorted desc [JVP,NBD,LM]
+     *   center=1 → result = [NBD, JVP, LM]  ← JVP at center index ✓
+     */
+    _sortChildrenCentered(children) {
+        if (children.length <= 1) return children;
+
+        const sorted = [...children].sort(
+            (a, b) => this._getSubtreeDepth(b.id) - this._getSubtreeDepth(a.id)
+        );
+
+        const result = new Array(children.length);
+        const center = Math.floor(children.length / 2);
+        result[center] = sorted[0]; // deepest at center
+
+        let lo = center - 1;
+        let hi = center + 1;
+        for (let k = 1; k < sorted.length; k++) {
+            if (lo >= 0) { result[lo--] = sorted[k++]; }
+            if (k < sorted.length && hi < children.length) { result[hi++] = sorted[k]; }
         }
 
-        // ─── Render one lane (row) per branch ───
-        const BRANCH_ORDER = [
-            'management', 'executive', 'kitchen', 'logistics',
-            'marketing', 'pricing', 'restaurant',
-            'recruiting', 'training', 'service', 'finance',
-        ];
+        return result.filter(Boolean);
+    }
 
-        const branchesToRender = [
-            ...BRANCH_ORDER.filter(b => byBranch[b]),
-            ...Object.keys(byBranch).filter(b => !BRANCH_ORDER.includes(b)),
-        ];
+    /**
+     * Recursively renders one employee node and its children (left-to-right).
+     * Returns a .ct-node-group element.
+     */
+    _renderCareerNode(emp) {
+        const branchDef = BRANCHES[emp.branch] || { color: '#999', label: emp.branch };
+        const branchColor = branchDef.color;
 
-        for (const branchId of branchesToRender) {
-            const emps = byBranch[branchId];
-            if (!emps || emps.length === 0) continue;
+        // ── Card ──
+        const card = document.createElement('div');
+        card.className = 'ct-node-card';
+        card.style.setProperty('--ct-branch-color', branchColor);
+        card.style.borderLeftColor = branchColor;
 
-            const branchDef = BRANCHES[branchId] || { label: branchId, color: '#999', icon: '?' };
+        const badges = [];
+        if (emp.salary > 0) badges.push('<span class="ct-salary-icon" title="Paga salário">💸</span>');
+        if (emp.is1x) badges.push('<span class="ct-badge-1x">1× Único</span>');
 
-            // ── Lane wrapper ──
-            const lane = document.createElement('div');
-            lane.className = 'cp-lane';
-            lane.style.setProperty('--branch-color', branchDef.color);
+        card.innerHTML = `
+            <span class="ct-card-name">${emp.name}</span>
+            <div class="ct-card-badges">
+                ${emp.salary > 0 ? '<span class="ct-salary-icon" title="Paga salário">💸</span>' : ''}
+                ${emp.is1x ? '<span class="ct-badge-1x">1× Único</span>' : ''}
+            </div>
+        `;
 
-            // ── Lane label (leftmost) ──
-            const label = document.createElement('div');
-            label.className = 'cp-lane-label';
-            label.innerHTML = `<span class="cp-lane-icon">${branchDef.icon}</span><span>${branchDef.label}</span>`;
-            lane.appendChild(label);
+        // ── Selection handler ──
+        card.addEventListener('click', () => {
+            const wasSelected = this._selectedCareerCardId === emp.id;
 
-            // ── Track: cards + connectors ──
-            const track = document.createElement('div');
-            track.className = 'cp-track';
+            document.querySelectorAll('.ct-node-card.selected')
+                .forEach(c => c.classList.remove('selected'));
 
-            for (let i = 0; i < emps.length; i++) {
-                const emp = emps[i];
-
-                const samePromotions = emp.promotesTo.filter(tid => {
-                    const target = empMap[tid];
-                    return target && target.branch === branchId;
-                });
-
-                // ── Card ──
-                const card = document.createElement('div');
-                card.className = 'cp-card';
-                if (emp.is1x) card.classList.add('cp-1x');
-
-                card.innerHTML = `
-                    <div class="cp-card-top">
-                        <span class="cp-card-name">${emp.name}</span>
-                        ${emp.salary > 0 ? '<span class="cp-salary-icon" title="Charges Salary">💸</span>' : ''}
-                    </div>
-                    <p class="cp-card-action">${emp.action?.description || '—'}</p>
-                    <div class="cp-card-foot">
-                        ${emp.is1x ? '<span class="cp-badge">1× Unique</span>' : ''}
-                    </div>
-                `;
-
-                track.appendChild(card);
-
-                // ── Arrow connector (between this card and the next in same branch) ──
-                if (samePromotions.length > 0 && i < emps.length - 1) {
-                    const arrow = document.createElement('div');
-                    arrow.className = 'cp-arrow';
-                    arrow.textContent = samePromotions.length > 1 ? '⇒' : '→';
-                    track.appendChild(arrow);
-                } else if (i < emps.length - 1) {
-                    // Gap between unconnected cards in the same branch
-                    const spacer = document.createElement('div');
-                    spacer.className = 'cp-spacer';
-                    track.appendChild(spacer);
-                }
+            if (wasSelected) {
+                this._selectedCareerCardId = null;
+                this._clearCareerDetailPanel();
+                this.elements.ctFooterSelected.textContent = 'Nenhum selecionado';
+            } else {
+                this._selectedCareerCardId = emp.id;
+                card.classList.add('selected');
+                this._renderCareerDetailPanel(emp, branchColor);
+                this.elements.ctFooterSelected.textContent = `Selecionado: ${emp.name}`;
             }
+        });
 
-            lane.appendChild(track);
-            grid.appendChild(lane);
+        // ── Slot: card + optional horizontal connector ──
+        const slot = document.createElement('div');
+        slot.className = 'ct-node-slot';
+        slot.appendChild(card);
+
+        const rawChildren = (emp.promotesTo || []).map(id => EMPLOYEES[id]).filter(Boolean);
+        // Sort so deepest subtree is at the center — fixes main-chain alignment
+        const children = this._sortChildrenCentered(rawChildren);
+
+        if (children.length > 0) {
+            const connH = document.createElement('div');
+            connH.className = 'ct-conn-h';
+            slot.appendChild(connH);
         }
 
-        this.elements.careerTreeModal.classList.remove('hidden');
+        // ── Group: slot + children column ──
+        const group = document.createElement('div');
+        group.className = 'ct-node-group';
+        group.appendChild(slot);
+
+        if (children.length > 0) {
+            const childrenCol = document.createElement('div');
+            childrenCol.className = 'ct-children-col';
+
+            children.forEach((child, i) => {
+                const childGroup = document.createElement('div');
+                childGroup.style.display = 'flex';
+                childGroup.style.flexDirection = 'row';
+                childGroup.style.alignItems = 'center';
+
+                const legH = document.createElement('div');
+                legH.className = 'ct-conn-branch';
+                childGroup.appendChild(legH);
+
+                const childNode = this._renderCareerNode(child);
+                childGroup.appendChild(childNode);
+                childrenCol.appendChild(childGroup);
+
+                // Vertical connector between siblings (not after last)
+                if (i < children.length - 1) {
+                    const vLine = document.createElement('div');
+                    vLine.className = 'ct-conn-v';
+                    vLine.style.height = '8px';  // reduzido de 16px → 8px
+                    vLine.style.marginLeft = '0';
+                    vLine.style.width = '2px';
+                    childrenCol.appendChild(vLine);
+                }
+            });
+
+            group.appendChild(childrenCol);
+        }
+
+        return group;
+    }
+
+    _renderCareerDetailPanel(emp, branchColor) {
+        const panel = this.elements.ctDetailPanel;
+        const branchDef = BRANCHES[emp.branch] || { color: '#999', label: emp.branch };
+        const color = branchColor || branchDef.color;
+
+        const salaryHtml = emp.salary > 0
+            ? `💸 $${emp.salary}/turno`
+            : 'Gratuito';
+
+        const prevReqs = (emp.promotesFrom || []).map(id => {
+            const e = EMPLOYEES[id];
+            return e ? `<div class="ct-detail-chip" style="border-left-color:${color}">${e.name}</div>` : '';
+        }).join('');
+
+        const nextCards = (emp.promotesTo || []).map(id => {
+            const e = EMPLOYEES[id];
+            if (!e) return '';
+            const c = (BRANCHES[e.branch] || {}).color || '#999';
+            return `<div class="ct-detail-chip" style="border-left-color:${c}">${e.name}</div>`;
+        }).join('');
+
+        panel.innerHTML = `
+            <div class="ct-detail-name" style="color:${color}">${emp.name}</div>
+            <div class="ct-detail-salary">${salaryHtml}${emp.is1x ? ' &nbsp;·&nbsp; <strong>1× Único</strong>' : ''}</div>
+
+            <div class="ct-detail-section-title">Ação</div>
+            <p class="ct-detail-action">${emp.action?.description || '—'}</p>
+
+            <div class="ct-detail-section-title">Pré-requisito</div>
+            <div class="ct-detail-chip-list">
+                ${prevReqs || '<span class="ct-detail-none">Nenhum (entrada)</span>'}
+            </div>
+
+            <div class="ct-detail-section-title">Pode evoluir para</div>
+            <div class="ct-detail-chip-list">
+                ${nextCards || '<span class="ct-detail-none">Nenhum (máximo)</span>'}
+            </div>
+        `;
+    }
+
+    _clearCareerDetailPanel() {
+        const panel = this.elements.ctDetailPanel;
+        if (!panel) return;
+        panel.innerHTML = `
+            <div class="ct-detail-empty">
+                <span class="ct-detail-empty-icon">🗂️</span>
+                <p>Selecione um funcionário para ver os detalhes</p>
+            </div>
+        `;
+    }
+
+    _renderCareerLegend() {
+        const legend = this.elements.ctLegend;
+        if (!legend || typeof BRANCHES === 'undefined') return;
+        legend.innerHTML = '';
+
+        for (const [, def] of Object.entries(BRANCHES)) {
+            const item = document.createElement('div');
+            item.className = 'ct-legend-item';
+            item.innerHTML = `
+                <span class="ct-legend-swatch" style="background:${def.color}"></span>
+                <span>${def.label}</span>
+            `;
+            legend.appendChild(item);
+        }
     }
 
     hideCareerTreeModal() {
-        this.elements.careerTreeModal.classList.add('hidden');
+        this.elements.careerTreeOverlay.classList.add('hidden');
     }
 
     // ═══════════════════════════════════════════

@@ -145,12 +145,36 @@
             </div>
         </div>
 
-        <!-- Career Tree Modal -->
-        <div id="career-tree-modal" class="modal hidden">
-            <div class="modal-content modal-fullwidth">
-                <h2>🌱 Career Tree</h2>
-                <div id="career-tree-grid" class="career-tree-grid"></div>
-                <button id="close-career-tree-btn" class="btn-secondary">Close</button>
+        <!-- Career Tree Modal (novo) -->
+        <div id="career-tree-overlay" class="ct-overlay hidden">
+            <div id="career-tree-modal" class="ct-modal">
+
+                <!-- Header -->
+                <div class="ct-header">
+                    <div class="ct-header-text">
+                        <h2 class="ct-title">📈 Progressão de Carreira</h2>
+                        <p class="ct-subtitle">Clique num card para ver os detalhes</p>
+                    </div>
+                    <button id="close-career-tree-btn" class="ct-close-btn">✕</button>
+                </div>
+
+                <!-- Body -->
+                <div class="ct-body">
+                    <div id="career-tree-grid" class="ct-tree-area"></div>
+                    <div id="ct-detail-panel" class="ct-detail-panel">
+                        <div class="ct-detail-empty">
+                            <span class="ct-detail-empty-icon">🗂️</span>
+                            <p>Selecione um funcionário para ver os detalhes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="ct-footer">
+                    <div class="ct-legend" id="ct-legend"></div>
+                    <div class="ct-footer-selected" id="ct-footer-selected">Nenhum selecionado</div>
+                </div>
+
             </div>
         </div>
 
